@@ -1,0 +1,16 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.3">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- The playground runs without the Aspire CLI bundle. -->
+    <NoWarn>$(NoWarn);ASPIRE010</NoWarn>
+    <UserSecretsId>5f0b7c1e-3d0e-4c55-9c0f-2a1f6e8b4c11</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CamusDB.ApiService\CamusDB.ApiService.csproj" />
+    <ProjectReference Include="..\..\src\CamusDB.Aspire.Hosting\CamusDB.Aspire.Hosting.csproj" IsAspireProjectResource="false" />
+  </ItemGroup>
+
+</Project>

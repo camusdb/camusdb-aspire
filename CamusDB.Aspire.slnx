@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CamusDB.Aspire.Client/CamusDB.Aspire.Client.csproj" />
+    <Project Path="src/CamusDB.Aspire.EntityFrameworkCore/CamusDB.Aspire.EntityFrameworkCore.csproj" />
+    <Project Path="src/CamusDB.Aspire.Hosting/CamusDB.Aspire.Hosting.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CamusDB.Aspire.Client.Tests/CamusDB.Aspire.Client.Tests.csproj" />
+    <Project Path="tests/CamusDB.Aspire.Hosting.Tests/CamusDB.Aspire.Hosting.Tests.csproj" />
+  </Folder>
+  <Folder Name="/playground/">
+    <Project Path="playground/CamusDB.ApiService/CamusDB.ApiService.csproj" />
+    <Project Path="playground/CamusDB.AppHost/CamusDB.AppHost.csproj" />
+  </Folder>
+</Solution>

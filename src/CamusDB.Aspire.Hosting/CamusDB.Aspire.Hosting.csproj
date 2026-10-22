@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>CamusDB.Aspire.Hosting</PackageId>
+    <Description>Aspire hosting integration for CamusDB: AddCamusDB() runs a CamusDB server container in an Aspire AppHost and AddDatabase() creates its databases.</Description>
+    <PackageTags>aspire;hosting;camusdb;database;sql</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting" Version="13.6.3" />
+    <PackageReference Include="CamusDB.Client" Version="0.16.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="CamusDB.Aspire.Hosting.Tests" />
+  </ItemGroup>
+
+</Project>
