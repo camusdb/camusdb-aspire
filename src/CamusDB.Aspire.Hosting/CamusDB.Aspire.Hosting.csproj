@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting" Version="13.6.3" />
-    <PackageReference Include="CamusDB.Client" Version="0.16.1" />
+    <PackageReference Include="Aspire.Hosting" Version="13.6.4" />
+    <PackageReference Include="CamusDB.Client" Version="0.17.2" />
   </ItemGroup>
 
   <ItemGroup>

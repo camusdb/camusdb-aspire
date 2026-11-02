@@ -13,4 +13,8 @@
     <ProjectReference Include="..\..\src\CamusDB.Aspire.Hosting\CamusDB.Aspire.Hosting.csproj" IsAspireProjectResource="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.6.4" />
+  </ItemGroup>
+
 </Project>
