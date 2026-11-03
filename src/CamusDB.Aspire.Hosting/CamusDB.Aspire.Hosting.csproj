@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>CamusDB.Aspire.Hosting</PackageId>
-    <Description>Aspire hosting integration for CamusDB: AddCamusDB() runs a CamusDB server container in an Aspire AppHost and AddDatabase() creates its databases.</Description>
-    <PackageTags>aspire;hosting;camusdb;database;sql</PackageTags>
+    <Description>Aspire hosting integration for CamusDB: AddCamusDB() runs a CamusDB server container in an Aspire AppHost, AddCamusDBCluster() runs a CamusDB cluster, and AddDatabase() creates their databases.</Description>
+    <PackageTags>aspire;hosting;camusdb;database;sql;cluster;raft</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

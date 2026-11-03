@@ -6,10 +6,6 @@
  */
 
 using Aspire.Hosting.ApplicationModel;
-using CamusDB.Client;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
 
 namespace Aspire.Hosting;
 
@@ -67,12 +63,7 @@ public static class CamusDBBuilderExtensions
         CamusDBDatabaseResource database = new(name, databaseName, builder.Resource);
         builder.Resource.AddDatabase(database);
 
-        string healthCheckKey = $"{name}_check";
-        builder.ApplicationBuilder.Services.AddHealthChecks().Add(new HealthCheckRegistration(
-            healthCheckKey,
-            _ => new CamusDBDatabaseHealthCheck(database),
-            failureStatus: default,
-            tags: default));
+        string healthCheckKey = CamusDBDatabaseCreator.AddHealthCheck(builder.ApplicationBuilder, name, database.State);
 
         return builder.ApplicationBuilder.AddResource(database)
             .WithHealthCheck(healthCheckKey);
@@ -186,59 +177,10 @@ public static class CamusDBBuilderExtensions
                 "--require-tls-when-auth-enabled=false");
     }
 
-    private static async Task CreateDatabasesAsync(CamusDBServerResource server, ResourceReadyEvent @event, CancellationToken cancellationToken)
-    {
-        if (server.DatabaseResources.Count == 0)
-            return;
-
-        ResourceLoggerService loggers = @event.Services.GetRequiredService<ResourceLoggerService>();
-        string? connectionString = await server.ConnectionStringExpression.GetValueAsync(cancellationToken).ConfigureAwait(false);
-
-        foreach (CamusDBDatabaseResource database in server.DatabaseResources)
-        {
-            ILogger logger = loggers.GetLogger(database);
-
-            try
-            {
-                CamusConnectionStringBuilder connectionStringBuilder = new($"{connectionString};Database={database.DatabaseName}");
-                await CreateDatabaseAsync(connectionStringBuilder, cancellationToken).ConfigureAwait(false);
-
-                database.CreationError = null;
-                database.Created = true;
-                logger.LogInformation("Database '{DatabaseName}' is ready.", database.DatabaseName);
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                database.CreationError = ex;
-                logger.LogError(ex, "Failed to create database '{DatabaseName}'.", database.DatabaseName);
-            }
-        }
-    }
-
-    // /health answers before the server elects its Raft leaders and seeds the bootstrap superuser, so with
-    // authentication on the first login can fail with CADB0516. The retries back off because the server
-    // allows 20 logins per account per minute.
-    private static async Task CreateDatabaseAsync(CamusConnectionStringBuilder connectionStringBuilder, CancellationToken cancellationToken)
-    {
-        const string AuthenticationFailed = "CADB0516";
-
-        DateTime deadline = DateTime.UtcNow.AddSeconds(60);
-        TimeSpan delay = TimeSpan.FromMilliseconds(500);
-
-        while (true)
-        {
-            try
-            {
-                await using CamusConnection connection = new(connectionStringBuilder);
-                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-                await connection.CreateDatabaseAsync(ifNotExists: true, cancellationToken).ConfigureAwait(false);
-                return;
-            }
-            catch (CamusException ex) when (ex.Code == AuthenticationFailed && DateTime.UtcNow + delay < deadline)
-            {
-                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
-                delay = TimeSpan.FromTicks(Math.Min(delay.Ticks * 2, TimeSpan.FromSeconds(8).Ticks));
-            }
-        }
-    }
+    private static Task CreateDatabasesAsync(CamusDBServerResource server, ResourceReadyEvent @event, CancellationToken cancellationToken) =>
+        CamusDBDatabaseCreator.CreateAsync(
+            server.ConnectionStringExpression,
+            [.. server.DatabaseResources.Select(database => ((IResource)database, database.State))],
+            @event.Services,
+            cancellationToken);
 }

@@ -16,14 +16,24 @@ WebApplication app = builder.Build();
 
 app.MapHealthChecks("/health");
 
-await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
+// With a cluster, the first request to a node that is down fails, and the client skips that node after
+// that. Thus the table creation gets one more try, which goes to another node.
+for (int attempt = 1; ; attempt++)
 {
-    await using CamusConnection connection = scope.ServiceProvider.GetRequiredService<CamusConnection>();
-    await connection.OpenAsync();
+    try
+    {
+        await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
+        await using CamusConnection connection = scope.ServiceProvider.GetRequiredService<CamusConnection>();
+        await connection.OpenAsync();
 
-    await using CamusCommand create = connection.CreateCamusCommand(
-        "CREATE TABLE IF NOT EXISTS todos (id oid PRIMARY KEY NOT NULL, title string NOT NULL, done bool NOT NULL)");
-    await create.ExecuteNonQueryAsync();
+        await using CamusCommand create = connection.CreateCamusCommand(
+            "CREATE TABLE IF NOT EXISTS todos (id oid PRIMARY KEY NOT NULL, title string NOT NULL, done bool NOT NULL)");
+        await create.ExecuteNonQueryAsync();
+        break;
+    }
+    catch (CamusException) when (attempt < 2)
+    {
+    }
 }
 
 app.MapGet("/todos", async (CamusConnection connection) =>

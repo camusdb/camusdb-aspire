@@ -5,7 +5,6 @@
  * file that was distributed with this source code.
  */
 
-using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Aspire.Hosting;
@@ -14,7 +13,7 @@ namespace Aspire.Hosting;
 /// Reports a CamusDB database as healthy after the AppHost creates it. A resource that waits for the
 /// database thus starts only when the database exists.
 /// </summary>
-internal sealed class CamusDBDatabaseHealthCheck(CamusDBDatabaseResource database) : IHealthCheck
+internal sealed class CamusDBDatabaseHealthCheck(CamusDBDatabaseState database) : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {

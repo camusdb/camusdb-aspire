@@ -12,4 +12,8 @@
     <Project Path="playground/CamusDB.ApiService/CamusDB.ApiService.csproj" />
     <Project Path="playground/CamusDB.AppHost/CamusDB.AppHost.csproj" />
   </Folder>
+  <Folder Name="/examples/">
+    <Project Path="examples/ClusterExample/ClusterExample.Api/ClusterExample.Api.csproj" />
+    <Project Path="examples/ClusterExample/ClusterExample.AppHost/ClusterExample.AppHost.csproj" />
+  </Folder>
 </Solution>

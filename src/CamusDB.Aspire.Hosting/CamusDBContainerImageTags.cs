@@ -16,6 +16,6 @@ internal static class CamusDBContainerImageTags
     /// <remarks>camusdb/camusdb</remarks>
     public const string Image = "camusdb/camusdb";
 
-    /// <remarks>0.15.3</remarks>
-    public const string Tag = "0.15.3";
+    /// <remarks>0.17.0</remarks>
+    public const string Tag = "0.17.0";
 }

@@ -2,19 +2,45 @@ using Microsoft.Extensions.Configuration;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
-IResourceBuilder<CamusDBServerResource> camus = builder.AddCamusDB("camus");
+bool ephemeral = builder.Configuration.GetValue<bool>("Playground:Ephemeral");
+bool authentication = builder.Configuration.GetValue<bool>("Playground:Authentication");
+bool grpc = builder.Configuration.GetValue<bool>("Playground:Grpc");
+int clusterNodes = builder.Configuration.GetValue<int>("Playground:ClusterNodes");
 
-// The playground keeps its data in a volume unless a run asks for a clean server.
-if (!builder.Configuration.GetValue<bool>("Playground:Ephemeral"))
-    camus.WithDataVolume();
+IResourceBuilder<IResourceWithConnectionString> appDb;
 
-if (builder.Configuration.GetValue<bool>("Playground:Authentication"))
-    camus.WithAuthentication();
+if (clusterNodes > 0)
+{
+    IResourceBuilder<CamusDBClusterResource> camus = builder.AddCamusDBCluster("camus", nodes: clusterNodes);
 
-if (builder.Configuration.GetValue<bool>("Playground:Grpc"))
-    camus.WithProtocol(CamusDBProtocol.Grpc);
+    // The playground keeps its data in volumes unless a run asks for a clean cluster.
+    if (!ephemeral)
+        camus.WithDataVolume();
 
-IResourceBuilder<CamusDBDatabaseResource> appDb = camus.AddDatabase("appdb");
+    if (authentication)
+        camus.WithAuthentication();
+
+    if (grpc)
+        camus.WithProtocol(CamusDBProtocol.Grpc);
+
+    appDb = camus.AddDatabase("appdb");
+}
+else
+{
+    IResourceBuilder<CamusDBServerResource> camus = builder.AddCamusDB("camus");
+
+    // The playground keeps its data in a volume unless a run asks for a clean server.
+    if (!ephemeral)
+        camus.WithDataVolume();
+
+    if (authentication)
+        camus.WithAuthentication();
+
+    if (grpc)
+        camus.WithProtocol(CamusDBProtocol.Grpc);
+
+    appDb = camus.AddDatabase("appdb");
+}
 
 builder.AddProject<Projects.CamusDB_ApiService>("api")
     .WithReference(appDb)

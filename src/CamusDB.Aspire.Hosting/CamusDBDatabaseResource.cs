@@ -5,6 +5,8 @@
  * file that was distributed with this source code.
  */
 
+using Aspire.Hosting;
+
 namespace Aspire.Hosting.ApplicationModel;
 
 /// <summary>
@@ -24,6 +26,7 @@ public class CamusDBDatabaseResource : Resource, IResourceWithParent<CamusDBServ
 
         DatabaseName = databaseName;
         Parent = parent;
+        State = new CamusDBDatabaseState(databaseName);
     }
 
     /// <summary>Gets the CamusDB server that holds the database.</summary>
@@ -36,8 +39,7 @@ public class CamusDBDatabaseResource : Resource, IResourceWithParent<CamusDBServ
     public ReferenceExpression ConnectionStringExpression => Parent.BuildConnectionString(DatabaseName);
 
     // Set when the AppHost creates the database; read by the database health check.
-    internal volatile bool Created;
-    internal volatile Exception? CreationError;
+    internal CamusDBDatabaseState State { get; }
 
     IEnumerable<KeyValuePair<string, ReferenceExpression>> IResourceWithConnectionString.GetConnectionProperties() =>
         Parent.CombineProperties([new("Database", ReferenceExpression.Create($"{DatabaseName}"))]);

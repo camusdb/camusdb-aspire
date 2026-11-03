@@ -1,4 +1,3 @@
-using System.Net.Sockets;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using CamusDB.Client;
@@ -20,7 +19,7 @@ public sealed class AddCamusDBTests
         ContainerImageAnnotation image = Assert.Single(resource.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("docker.io", image.Registry);
         Assert.Equal("camusdb/camusdb", image.Image);
-        Assert.Equal("0.15.3", image.Tag);
+        Assert.Equal("0.17.0", image.Tag);
 
         EndpointAnnotation http = resource.Annotations.OfType<EndpointAnnotation>().Single(e => e.Name == "http");
         Assert.Equal(5095, http.TargetPort);
@@ -108,13 +107,13 @@ public sealed class AddCamusDBTests
             "Endpoint={camus.bindings.http.url};Database=app;User={camus-user.value};Password='{camus-pass.value}';AllowInsecureCredentials=true",
             db.Resource.ConnectionStringExpression.ValueExpression);
 
-        Dictionary<string, string?> environment = await GetEnvironmentAsync(camus.Resource);
+        Dictionary<string, string?> environment = await ResourceTestHelpers.GetEnvironmentAsync(camus.Resource);
         Assert.Equal("true", environment["CAMUSDB_AUTH_ENABLED"]);
         Assert.Equal("root", environment["CAMUSDB_BOOTSTRAP_USER"]);
         Assert.Equal("p;ss", environment["CAMUSDB_BOOTSTRAP_PASSWORD"]);
         Assert.True(environment["CAMUSDB_AUTH_TOKEN_KEY"]!.Length >= 32);
 
-        IReadOnlyList<object> args = await GetArgsAsync(camus.Resource);
+        IReadOnlyList<object> args = await ResourceTestHelpers.GetArgsAsync(camus.Resource);
         Assert.Equal("-c", args[0]);
         Assert.Contains("--require-tls-when-auth-enabled=false", (string)args[1]);
     }
@@ -141,7 +140,7 @@ public sealed class AddCamusDBTests
         IResourceBuilder<CamusDBServerResource> camus = builder.AddCamusDB("camus").WithAuthentication(password: pass);
         IResourceBuilder<CamusDBDatabaseResource> db = camus.AddDatabase("app");
 
-        AllocateEndpoints(camus.Resource);
+        ResourceTestHelpers.AllocateEndpoints(camus.Resource);
 
         string? connectionString = await db.Resource.ConnectionStringExpression.GetValueAsync(CancellationToken.None);
         Assert.Equal("Endpoint=http://localhost:5095;Database=app;User=admin;Password='pa;ss';AllowInsecureCredentials=true", connectionString);
@@ -160,7 +159,7 @@ public sealed class AddCamusDBTests
         IResourceBuilder<CamusDBServerResource> camus = builder.AddCamusDB("camus");
         IResourceBuilder<CamusDBDatabaseResource> db = camus.AddDatabase("app");
 
-        AllocateEndpoints(camus.Resource);
+        ResourceTestHelpers.AllocateEndpoints(camus.Resource);
 
         Dictionary<string, string?> properties = [];
         foreach ((string key, ReferenceExpression value) in ((IResourceWithConnectionString)db.Resource).GetConnectionProperties())
@@ -172,42 +171,5 @@ public sealed class AddCamusDBTests
         Assert.Equal("http://localhost:5095", properties["Uri"]);
         Assert.Equal("app", properties["Database"]);
         Assert.False(properties.ContainsKey("Password"));
-    }
-
-    private static void AllocateEndpoints(CamusDBServerResource resource)
-    {
-        foreach (EndpointAnnotation endpoint in resource.Annotations.OfType<EndpointAnnotation>())
-            endpoint.AllocatedEndpoint = new AllocatedEndpoint(endpoint, "localhost", endpoint.TargetPort!.Value);
-    }
-
-    private static async Task<Dictionary<string, string?>> GetEnvironmentAsync(IResourceWithEnvironment resource)
-    {
-        Dictionary<string, object> values = [];
-        EnvironmentCallbackContext context = new(new DistributedApplicationExecutionContext(DistributedApplicationOperation.Run), resource, values);
-
-        foreach (EnvironmentCallbackAnnotation callback in resource.Annotations.OfType<EnvironmentCallbackAnnotation>())
-            await callback.Callback(context);
-
-        Dictionary<string, string?> result = [];
-        foreach ((string key, object value) in values)
-            result[key] = value switch
-            {
-                string text => text,
-                IValueProvider provider => await provider.GetValueAsync(CancellationToken.None),
-                _ => value.ToString(),
-            };
-
-        return result;
-    }
-
-    private static async Task<IReadOnlyList<object>> GetArgsAsync(IResourceWithArgs resource)
-    {
-        List<object> args = [];
-        CommandLineArgsCallbackContext context = new(args);
-
-        foreach (CommandLineArgsCallbackAnnotation callback in resource.Annotations.OfType<CommandLineArgsCallbackAnnotation>())
-            await callback.Callback(context);
-
-        return args;
     }
 }
