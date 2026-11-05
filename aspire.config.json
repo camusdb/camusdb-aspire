@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "examples/ClusterExample/ClusterExample.AppHost/ClusterExample.AppHost.csproj"
+  }
+}

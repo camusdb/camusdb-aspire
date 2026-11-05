@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
-    <Version>0.16.0</Version>
+    <Version>0.17.0</Version>
 
     <Authors>CamusDB</Authors>
     <Company>CamusDB</Company>
