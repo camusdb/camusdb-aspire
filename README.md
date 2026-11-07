@@ -1,14 +1,34 @@
 # CamusDB for Aspire
 
+[![CamusDB.Aspire.Hosting](https://img.shields.io/nuget/v/CamusDB.Aspire.Hosting?label=CamusDB.Aspire.Hosting)](https://www.nuget.org/packages/CamusDB.Aspire.Hosting)
+[![CamusDB.Aspire.Client](https://img.shields.io/nuget/v/CamusDB.Aspire.Client?label=CamusDB.Aspire.Client)](https://www.nuget.org/packages/CamusDB.Aspire.Client)
+[![CamusDB.Aspire.EntityFrameworkCore](https://img.shields.io/nuget/v/CamusDB.Aspire.EntityFrameworkCore?label=CamusDB.Aspire.EntityFrameworkCore)](https://www.nuget.org/packages/CamusDB.Aspire.EntityFrameworkCore)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 [Aspire](https://aspire.dev) integrations for [CamusDB](https://github.com/camusdb/camusdb). They are
 built on the CamusDB .NET client libraries from
 [camusdb-dotnet](https://github.com/camusdb/camusdb-dotnet).
 
-| Package | Use it in | What it does |
-| --- | --- | --- |
-| [`CamusDB.Aspire.Hosting`](src/CamusDB.Aspire.Hosting/README.md) | The AppHost | Runs a CamusDB container or a CamusDB cluster, creates databases, gives connection strings. |
-| [`CamusDB.Aspire.Client`](src/CamusDB.Aspire.Client/README.md) | A service project | Registers `CamusDB.Client` connections, with a health check, tracing and metrics. |
-| [`CamusDB.Aspire.EntityFrameworkCore`](src/CamusDB.Aspire.EntityFrameworkCore/README.md) | A service project | Registers a pooled `DbContext` on the CamusDB EF Core provider. |
+| Package | NuGet | Use it in | What it does |
+| --- | --- | --- | --- |
+| [`CamusDB.Aspire.Hosting`](src/CamusDB.Aspire.Hosting/README.md) | [nuget.org](https://www.nuget.org/packages/CamusDB.Aspire.Hosting) | The AppHost | Runs a CamusDB container or a CamusDB cluster, creates databases, gives connection strings. |
+| [`CamusDB.Aspire.Client`](src/CamusDB.Aspire.Client/README.md) | [nuget.org](https://www.nuget.org/packages/CamusDB.Aspire.Client) | A service project | Registers `CamusDB.Client` connections, with a health check, tracing and metrics. |
+| [`CamusDB.Aspire.EntityFrameworkCore`](src/CamusDB.Aspire.EntityFrameworkCore/README.md) | [nuget.org](https://www.nuget.org/packages/CamusDB.Aspire.EntityFrameworkCore) | A service project | Registers a pooled `DbContext` on the CamusDB EF Core provider. |
+
+## Install
+
+In the AppHost project:
+
+```shell
+dotnet add package CamusDB.Aspire.Hosting
+```
+
+In a service project, add one of the client packages:
+
+```shell
+dotnet add package CamusDB.Aspire.Client                # ADO.NET
+dotnet add package CamusDB.Aspire.EntityFrameworkCore   # EF Core
+```
 
 ## Quick start
 
@@ -42,7 +62,7 @@ builder.AddCamusDBDbContext<AppDbContext>("appdb"); // EF Core
 | Dependency | Version |
 | --- | --- |
 | Aspire | 13.6.4 |
-| `CamusDB.Client`, `CamusDB.EntityFrameworkCore` | 0.17.2 |
+| `CamusDB.Client`, `CamusDB.EntityFrameworkCore` | 0.17.5 |
 | Server image `camusdb/camusdb` | 0.17.0 |
 | Target frameworks | Hosting: `net8.0`. Client: `net8.0`, `net9.0`, `net10.0`. EF Core: `net10.0`. |
 
@@ -113,3 +133,7 @@ dotnet run --project playground/CamusDB.AppHost -- --Playground:ClusterNodes=3
 ```
 
 The API has `GET /todos` and `POST /todos` with the body `{ "title": "..." }`.
+
+## License
+
+CamusDB for Aspire is released under the [MIT License](LICENSE).

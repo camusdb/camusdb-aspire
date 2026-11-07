@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CamusDB.Client" Version="0.17.4" />
+    <PackageReference Include="CamusDB.Client" Version="0.17.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.14" />
